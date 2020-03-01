@@ -73,17 +73,17 @@
       :button :button-height
       :countersunk :countersunk-height)))
 
-(defn total-bolt-length
+(defn bolt-length
   "Get the projected length of an ISO bolt, including the head.
   This is exposed for predicting the results of the bolt function in this
-  module and takes the same parameters, but as a single map."
+  module. Unlike the base/bolt-length function, it takes the same parameters
+  as the bolt function."
   [{:keys [m-diameter total-length unthreaded-length threaded-length head-type]
-    :or {unthreaded-length 0, threaded-length 0}
     :as options}]
   {:pre [(spec/valid? ::schema/bolt-parameters options)]}
-  (if total-length
-    total-length
-    (+ (head-height m-diameter head-type) unthreaded-length threaded-length)))
+  (base/bolt-length {:total total-length,
+                     :unthreaded unthreaded-length, :threaded threaded-length,
+                     :head (head-height m-diameter head-type)}))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
@@ -100,25 +100,6 @@
              :as shape-options}]
   (compensator m-diameter {:negative false}
     (-> shape-options (dissoc :compensator) (assoc :negative true) shape-fn)))
-
-(defn- shank-section-lengths
-  "Infer the lengths of the unthreaded and threaded parts of a bolt."
-  [{:keys [total unthreaded threaded head] :as parameters}]
-  (case (map some? [total unthreaded threaded])
-    [true  true  true ] (if (= total (+ unthreaded threaded head))
-                          [unthreaded threaded]
-                          (throw
-                            (ex-info "Contradictory bolt length parameters"
-                                     {:parameters parameters})))
-    [true  true  false] [unthreaded (- total unthreaded head)]
-    [true  false false] [0 (- total head)]
-    [false false false] (throw
-                          (ex-info "Insufficient bolt length parameters"
-                                   {:parameters parameters}))
-    [false false true ] [0 threaded]
-    [false true  true ] [unthreaded threaded]
-    [true  false true ] [(- total threaded head) threaded]
-    [false true  false] [unthreaded 0]))
 
 (defn- hex-item
   ([m-diameter height]
@@ -216,7 +197,7 @@
     :as options}]
   {:pre [(spec/valid? ::schema/bolt-parameters options)]}
   (let [hh (head-height m-diameter head-type)
-        lengths (shank-section-lengths
+        lengths (base/shank-section-lengths
                   {:total total-length, :unthreaded unthreaded-length,
                    :threaded threaded-length, :head hh})
         [unthreaded-length threaded-length] lengths

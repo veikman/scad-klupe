@@ -35,6 +35,37 @@
 ;; INTERFACE FUNCTIONS ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn shank-section-lengths
+  "Determine the lengths of the unthreaded and threaded parts of a bolt.
+  These can be explicit in the parameters to this function, or else they
+  are inferred from the total length and the length of the head."
+  [{:keys [total unthreaded threaded head] :as parameters}]
+  {:pre [(number? head)
+         (not (neg? head))
+         (>= (or total head) head)]}
+  (case (map some? [total unthreaded threaded])
+    [true  true  true ] (if (= total (+ unthreaded threaded head))
+                          [unthreaded threaded]
+                          (throw
+                            (ex-info "Contradictory bolt length parameters"
+                                     {:parameters parameters})))
+    [true  true  false] [unthreaded (- total unthreaded head)]
+    [true  false false] [0 (- total head)]
+    [false false false] (throw
+                          (ex-info "Insufficient bolt length parameters"
+                                   {:parameters parameters}))
+    [false false true ] [0 threaded]
+    [false true  true ] [unthreaded threaded]
+    [true  false true ] [(- total threaded head) threaded]
+    [false true  false] [unthreaded 0]))
+
+(defn bolt-length
+  "Predict the overall length of a bolt, including the head.
+  Use shank-section-lengths partly as a sanity check on the inputs."
+  [{:keys [total head] :as parameters}]
+  (let [[unthreaded threaded] (shank-section-lengths parameters)]
+    (if total total (+ head unthreaded threaded))))
+
 (defn bolt-inner-radius
   "The inner radius of a piece of threading, meaning the distance from the
   center of a threaded rod to the bottom of a valley in its threading.
