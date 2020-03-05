@@ -124,15 +124,21 @@
 (spec/def ::point-type #{:cone})
 
 ;; Parameters to the bolt function.
+;; First, a version that does not require length, to allow an application
+;; to first validate the user’s input and then inject a default length
+;; that does not override the user’s choice of parameter.
+(spec/def ::bolt-parameter-keys
+  (spec/keys :req-un [::m-diameter ::head-type]
+             :opt-un [::pitch ::angle
+                      ::total-length ::unthreaded-length ::threaded-length
+                      ::drive-type ::point-type
+                      ::resolution
+                      ::include-threading ::negative]))
+;; Second, the more complete spec used by scad-klupe itself.
 (spec/def ::bolt-parameters
   (spec/and
-    (spec/keys :req-un [::m-diameter ::head-type]
-               :opt-un [::pitch ::angle
-                        ::total-length ::unthreaded-length ::threaded-length
-                        ::drive-type ::point-type
-                        ::resolution
-                        ::include-threading ::negative])
-    (spec/or
+    ::bolt-parameter-keys
+    (spec/or  ; Any or all of the various length specifiers.
       :specific-total-length #(:total-length %)
       :specific-unthreaded-length #(:unthreaded-length %)
       :specific-threaded-length #(:threaded-length %))))
