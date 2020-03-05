@@ -59,8 +59,12 @@
                   {:nominal-diameter nominal-diameter
                    :requested-property key}))))))
 
-(defn head-height
-  "Get the height of an ISO bolt head.
+(defn head-length
+  "Get the axial length of an ISO bolt head.
+  This is more commonly thought of as a height, especially given the
+  vertical orientation of the model output by the bolt function. The word
+  “length” is intended to provide conceptual continuity with the more intuitive
+  bolt-length function, below, as well as bolt parameter names.
   This is exposed for predicting the results of the bolt function in this
   module, specifically where the transition from head to body will occur."
   [m-diameter head-type]
@@ -68,7 +72,7 @@
          (spec/valid? ::schema/head-type head-type)]}
   (datum m-diameter
     (case head-type
-      :hex :iso4017-hex-head-height-nominal
+      :hex :iso4017-hex-head-length-nominal
       :socket :socket-height
       :button :button-height
       :countersunk :countersunk-height)))
@@ -83,7 +87,7 @@
   {:pre [(spec/valid? ::schema/bolt-parameters options)]}
   (base/bolt-length {:total total-length,
                      :unthreaded unthreaded-length, :threaded threaded-length,
-                     :head (head-height m-diameter head-type)}))
+                     :head (head-length m-diameter head-type)}))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
@@ -119,7 +123,7 @@
     :or {countersink-edge-fn (fn [m-diameter] (/ (Math/log m-diameter) 8))}}]
   {:pre [(spec/valid? ::schema/m-diameter m-diameter)
          (spec/valid? ::schema/head-type head-type)]}
-  (let [height (head-height m-diameter head-type)]
+  (let [height (head-length m-diameter head-type)]
     (case head-type
       :hex
         (compensator (datum m-diameter :hex-head-long-diagonal) {}
@@ -145,7 +149,7 @@
   {:pre [(spec/valid? ::schema/m-diameter m-diameter)
          (spec/valid? ::schema/drive-type drive-type)]}
   (let [depth (or drive-recess-depth
-                  (/ (head-height m-diameter head-type) 2))]
+                  (/ (head-length m-diameter head-type) 2))]
     (model/translate [0 0 (/ depth -2)]
       (case drive-type
         :hex (hex-item m-diameter depth :head-hex-drive-long-diagonal)))))
@@ -196,7 +200,7 @@
          negative false, compensator dfm/none}
     :as options}]
   {:pre [(spec/valid? ::schema/bolt-parameters options)]}
-  (let [hh (head-height m-diameter head-type)
+  (let [hh (head-length m-diameter head-type)
         lengths (base/shank-section-lengths
                   {:total total-length, :unthreaded unthreaded-length,
                    :threaded threaded-length, :head hh})
