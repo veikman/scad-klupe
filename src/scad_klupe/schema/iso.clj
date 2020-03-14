@@ -1,5 +1,5 @@
-;;; Parameter schema for scad-termi.iso.
-;;; This is intended partly for parameter validation within scad-tarmi and
+;;; Parameter schema for scad-klupe.iso.
+;;; This is intended partly for parameter validation within scad-klupe and
 ;;; partly for use in the configuration layer of applications.
 
 (ns scad-klupe.schema.iso
@@ -139,6 +139,7 @@
   (spec/and
     ::bolt-parameter-keys
     (spec/or  ; Any or all of the various length specifiers.
+              ; See also scad-klupe.schema.base.
       :specific-total-length #(:total-length %)
       :specific-unthreaded-length #(:unthreaded-length %)
       :specific-threaded-length #(:threaded-length %))))
