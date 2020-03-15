@@ -23,13 +23,13 @@ printer inaccuracy.
 
 The main interface is the [`iso`](src/scad_klupe/iso.clj) module. If in your
 `ns` declaration you `(:require [scad-klupe.iso :refer [nut]])`, you can then
-call `(nut {:m-diameter 6})` for an internal threaded approximation of an ISO
+call `(nut {:m-diameter 6})` for an internally threaded approximation of an ISO
 262 M6 hex nut. Its height and external diameter are inferred from the
 standard, unless you pass overrides. For a matching 25 mm threaded bolt, call
-`(bolt {:m-diameter 6 :total-length 25})`.
+`(bolt {:m-diameter 6, :head-type :hex, :total-length 25})`.
 
 If you intend to model an M6 nut to carve out negative space for a real nut,
-the correct call would be `(nut {:m-diameter 6 :negative true})`, a less
+the correct call would be `(nut {:m-diameter 6, :negative true})`, a less
 complicated shape without a hole. The `bolt` function also takes a `negative`
 parameter, which elides the drive from the head, but the negative of a bolt is
 still threaded by default. If you just want a straight hole that you intend to
@@ -53,7 +53,7 @@ ISO standard data, more types of heads and drives, and non-metric standards.
 
 `scad-klupe` was broken out of `scad-tarmi` in 2020 while making
 backwards-incompatible changes to the API for programmatic use and taking a
-more consistent stance on bundled defaults.
+more consistent stance on parameter schemae and bundled defaults.
 
 The thread-drawing function (`scad-klupe.base/threading`) is a reimplementation
 in Clojure of a corresponding function in `polyScrewThread_r1.scad`, created by
