@@ -44,24 +44,27 @@
   "Determine the lengths of the unthreaded and threaded parts of a bolt.
   These can be explicit in the parameters to this function, or else they
   are inferred from the total length and the length of the head."
-  [{:keys [total unthreaded threaded head] :as parameters}]
+  [{:keys [total-length head-length unthreaded-length threaded-length]
+    :as parameters}]
   {:pre [(spec/valid? ::base/bolt-length-parameters parameters)]}
-  (case (map some? [total unthreaded threaded])
-    [true  true  true ] [unthreaded threaded]
-    [true  true  false] [unthreaded (- total unthreaded head)]
-    [true  false false] [0 (- total head)]
+  (case (map some? [total-length unthreaded-length threaded-length])
+    [true  true  true ] [unthreaded-length threaded-length]
+    [true  true  false] [unthreaded-length
+                         (- total-length unthreaded-length head-length)]
+    [true  false false] [0 (- total-length head-length)]
     [false false false] [0 0]  ; Case is contradictory to spec.
-    [false false true ] [0 threaded]
-    [false true  true ] [unthreaded threaded]
-    [true  false true ] [(- total threaded head) threaded]
-    [false true  false] [unthreaded 0]))
+    [false false true ] [0 threaded-length]
+    [false true  true ] [unthreaded-length threaded-length]
+    [true  false true ] [(- total-length threaded-length head-length)
+                         threaded-length]
+    [false true  false] [unthreaded-length 0]))
 
 (defn bolt-length
   "Predict the overall length of a bolt, including the head.
   Use shank-section-lengths partly for its sanity check on the inputs."
-  [{:keys [total head] :as parameters}]
+  [{:keys [total-length head-length] :as parameters}]
   (let [[unthreaded threaded] (shank-section-lengths parameters)]
-    (if total total (+ head unthreaded threaded))))
+    (if total-length total-length (+ head-length unthreaded threaded))))
 
 (defn bolt-inner-radius
   "The inner radius of a piece of threading, meaning the distance from the

@@ -3,7 +3,8 @@
 ;;; partly for use in the configuration layer of applications.
 
 (ns scad-klupe.schema.iso
-  (:require [clojure.spec.alpha :as spec]))
+  (:require [clojure.spec.alpha :as spec]
+            [scad-klupe.schema.base :as base]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;; INTERNAL CONSTANTS ;;
@@ -103,43 +104,38 @@
 
 ;; The following items are exposed for use in application data validation.
 
+;; Individual items in parameter maps:
 (spec/def ::m-diameter #(contains? iso-data %))  ; Nominal fastener diameter.
-(spec/def ::pitch pos?)
-(spec/def ::angle pos?)
-(spec/def ::total-length pos?)
-(spec/def ::unthreaded-length (complement neg?))
-(spec/def ::threaded-length (complement neg?))
-(spec/def ::resolution pos?)
-(spec/def ::include-threading boolean?)
-(spec/def ::negative boolean?)
 
-;; Supported types of bolt heads:
+;; Supported types of bolt heads, drives and points:
 (spec/def ::head-type #{:hex     ; Hex head with the diameter of a nut.
                         :socket  ; Full cylindrical counterbore cap.
                         :button  ; Partial (low, smooth-edged) socket cap.
                         :countersunk}) ; Flat head tapering toward the bolt.
-
-;; Supported types of bolt drives and points:
 (spec/def ::drive-type #{:hex})
 (spec/def ::point-type #{:cone})
 
-;; Parameters to the bolt function.
-;; First, a version that does not require length, to allow an application
+;; Parameters to the bolt function follow.
+
+;; First, a spec that does not require length, to allow an application
 ;; to first validate the user’s input and then inject a default length
 ;; that does not override the user’s choice of parameter.
 (spec/def ::bolt-parameter-keys
   (spec/keys :req-un [::m-diameter ::head-type]
-             :opt-un [::pitch ::angle
-                      ::total-length ::unthreaded-length ::threaded-length
+             :opt-un [::base/pitch ::base/angle ::base/total-length
+                      ::base/unthreaded-length ::base/threaded-length
                       ::drive-type ::point-type
-                      ::resolution
-                      ::include-threading ::negative]))
-;; Second, the more complete spec used by scad-klupe itself.
+                      ::base/resolution
+                      ::base/include-threading ::base/negative]))
+
+;; Second, a check for the mere presence (not values) of any length specifier.
+;; See scad-klupe.schema.base for internal relationships between these.
+(spec/def ::bolt-length-specifiers
+  (spec/or
+    :specific-total-length (spec/keys :req-un [::base/total-length])
+    :specific-unthreaded-length (spec/keys :reg-un [::base/unthreaded-length])
+    :specific-threaded-length (spec/keys :req-un [::base/threaded-length])))
+
+;; Third, the more complete spec used by scad-klupe itself.
 (spec/def ::bolt-parameters
-  (spec/and
-    ::bolt-parameter-keys
-    (spec/or  ; Any or all of the various length specifiers.
-              ; See also scad-klupe.schema.base.
-      :specific-total-length #(:total-length %)
-      :specific-unthreaded-length #(:unthreaded-length %)
-      :specific-threaded-length #(:threaded-length %))))
+  (spec/and ::bolt-parameter-keys ::bolt-length-specifiers))

@@ -21,9 +21,9 @@
   1.0472)
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; INTERFACE ACCESSOR TO CONSTANTS ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; INTERFACE FUNCTIONS — MINOR ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn datum
   "Retrieve or calculate a fact based on the ISO standards."
@@ -78,16 +78,13 @@
       :countersunk :countersunk-height)))
 
 (defn bolt-length
-  "Get the projected length of an ISO bolt, including the head.
-  This is exposed for predicting the results of the bolt function in this
-  module. Unlike the base/bolt-length function, it takes the same parameters
-  as the bolt function."
-  [{:keys [m-diameter total-length unthreaded-length threaded-length head-type]
-    :as options}]
-  {:pre [(spec/valid? ::schema/bolt-parameters options)]}
-  (base/bolt-length {:total total-length,
-                     :unthreaded unthreaded-length, :threaded threaded-length,
-                     :head (head-length m-diameter head-type)}))
+  "Get the projected length of an ISO bolt, including the head. This is
+  exposed for predicting the results of the bolt function in this module."
+  [{:keys [m-diameter head-type] :as options}]
+  {:pre [(spec/valid? ::schema/bolt-parameters options)
+         (spec/valid? ::schema/bolt-length-specifiers options)]}
+  (base/bolt-length
+    (assoc options :head-length (head-length m-diameter head-type))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
