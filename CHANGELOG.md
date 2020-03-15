@@ -2,6 +2,9 @@
 This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## Unreleased
+Nothing yet.
+
+## [Version 0.1.0]
 ### New
 - Copied threaded fastener functions from `scad-tarmi`, with structural
   changes:

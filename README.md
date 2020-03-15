@@ -1,4 +1,4 @@
-# `scad-klupe`: Threaded fasteneas for `scad-clj`
+# `scad-klupe`: Threaded fasteners for `scad-clj`
 
 This is a Clojure library for use in CAD work with Matthew Farrell’s
 [`scad-clj`](https://github.com/farrellm/scad-clj). It provides models of
