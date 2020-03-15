@@ -7,7 +7,8 @@
             [scad-tarmi.maybe :as maybe]
             [scad-tarmi.dfm :as dfm]
             [scad-klupe.base :as base]
-            [scad-klupe.schema.iso :as schema]))
+            [scad-klupe.schema.base :as base-schema]
+            [scad-klupe.schema.iso :as iso-schema]))
 
 
 ;;;;;;;;;;;;;;;
@@ -28,9 +29,9 @@
 (defn datum
   "Retrieve or calculate a fact based on the ISO standards."
   [nominal-diameter key]
-  {:pre [(spec/valid? ::schema/m-diameter nominal-diameter)
-         (spec/valid? ::schema/iso-property key)]}
-  (let [data (get schema/iso-data nominal-diameter)]
+  {:pre [(spec/valid? ::iso-schema/m-diameter nominal-diameter)
+         (spec/valid? ::iso-schema/iso-property key)]}
+  (let [data (get iso-schema/iso-data nominal-diameter)]
    (case key
      :hex-head-short-diagonal  ; Flat-to-flat width of a hex head.
        ;; For most sizes, this value is equal to socket diameter.
@@ -68,8 +69,8 @@
   This is exposed for predicting the results of the bolt function in this
   module, specifically where the transition from head to body will occur."
   [m-diameter head-type]
-  {:pre [(spec/valid? ::schema/m-diameter m-diameter)
-         (spec/valid? ::schema/head-type head-type)]}
+  {:pre [(spec/valid? ::iso-schema/m-diameter m-diameter)
+         (spec/valid? ::iso-schema/head-type head-type)]}
   (datum m-diameter
     (case head-type
       :hex :iso4017-hex-head-length-nominal
@@ -81,8 +82,8 @@
   "Get the projected length of an ISO bolt, including the head. This is
   exposed for predicting the results of the bolt function in this module."
   [{:keys [m-diameter head-type] :as options}]
-  {:pre [(spec/valid? ::schema/bolt-parameters options)
-         (spec/valid? ::schema/bolt-length-specifiers options)]}
+  {:pre [(spec/valid? ::iso-schema/bolt-parameters options)
+         (spec/valid? ::base-schema/bolt-length-specifiers options)]}
   (base/bolt-length
     (assoc options :head-length (head-length m-diameter head-type))))
 
@@ -118,8 +119,8 @@
   to make sure the head will not protrude with normal printing defects."
   [{:keys [m-diameter head-type countersink-edge-fn compensator]
     :or {countersink-edge-fn (fn [m-diameter] (/ (Math/log m-diameter) 8))}}]
-  {:pre [(spec/valid? ::schema/m-diameter m-diameter)
-         (spec/valid? ::schema/head-type head-type)]}
+  {:pre [(spec/valid? ::iso-schema/m-diameter m-diameter)
+         (spec/valid? ::iso-schema/head-type head-type)]}
   (let [height (head-length m-diameter head-type)]
     (case head-type
       :hex
@@ -143,8 +144,8 @@
 (defn- bolt-drive
   "A model of the thing you stick your bit in."
   [{:keys [m-diameter head-type drive-type drive-recess-depth]}]
-  {:pre [(spec/valid? ::schema/m-diameter m-diameter)
-         (spec/valid? ::schema/drive-type drive-type)]}
+  {:pre [(spec/valid? ::iso-schema/m-diameter m-diameter)
+         (spec/valid? ::iso-schema/drive-type drive-type)]}
   (let [depth (or drive-recess-depth
                   (/ (head-length m-diameter head-type) 2))]
     (model/translate [0 0 (/ depth -2)]
@@ -167,7 +168,7 @@
     :or {taper-fn base/rounding-taper, include-threading true,
          negative false, compensator dfm/none}
     :as options}]
-  {:pre [(spec/valid? ::schema/m-diameter m-diameter)]}
+  {:pre [(spec/valid? ::iso-schema/m-diameter m-diameter)]}
   (let [options (merge {:outer-diameter m-diameter
                         :pitch (datum m-diameter :thread-pitch-coarse)
                         :angle standard-threading-angle
@@ -196,11 +197,9 @@
     :or {angle standard-threading-angle, include-threading true,
          negative false, compensator dfm/none}
     :as options}]
-  {:pre [(spec/valid? ::schema/bolt-parameters options)]}
+  {:pre [(spec/valid? ::iso-schema/bolt-parameters options)]}
   (let [hh (head-length m-diameter head-type)
-        lengths (base/shank-section-lengths
-                  {:total total-length, :unthreaded unthreaded-length,
-                   :threaded threaded-length, :head hh})
+        lengths (base/shank-section-lengths (assoc options :head-length hh))
         [unthreaded-length threaded-length] lengths
         merged (merge
                  {:outer-diameter m-diameter
@@ -245,7 +244,7 @@
   [{:keys [m-diameter height compensator negative]
     :or {compensator dfm/none}
     :as options}]
-  {:pre [(spec/valid? ::schema/m-diameter m-diameter)]}
+  {:pre [(spec/valid? ::iso-schema/m-diameter m-diameter)]}
   (let [height (or height (datum m-diameter :hex-nut-height))]
     (if negative
       ;; A convex model of a nut.

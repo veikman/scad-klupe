@@ -13,32 +13,35 @@
 ;; The following items are exposed for use in application data validation.
 
 ;; Primitives.
+(spec/def ::positive (spec/and number? pos?))
 (spec/def ::non-negative (spec/and number? (complement neg?)))
-(spec/def ::optional (spec/nilable ::non-negative))
 
 ;; Individual items within common parameter maps.
-(spec/def ::pitch pos?)
-(spec/def ::angle pos?)
-(spec/def ::total-length pos?)
+(spec/def ::pitch ::positive)
+(spec/def ::angle ::positive)
+(spec/def ::total-length ::positive)
 (spec/def ::head-length ::non-negative)
 (spec/def ::unthreaded-length ::non-negative)
 (spec/def ::threaded-length ::non-negative)
-(spec/def ::resolution pos?)
+(spec/def ::resolution ::positive)
 (spec/def ::include-threading boolean?)
 (spec/def ::negative boolean?)
 
-;; Parameters to bolt length computing functions.
-;; Basic item-local spec:
+;; Basic item-local spec for computing bolt length:
 (spec/def ::bolt-length-parameter-keys
   (spec/keys :req-un [::head-length]
              :opt-un [::total-length ::unthreaded-length ::threaded-length]))
-;; A larger spec extending to arithmetic relationships:
-(spec/def ::bolt-length-parameters
+
+;; A check for the mere presence of at least one length specifier other than
+;; head length. This could have used spec’s or, but naming the options is not
+;; believed to be worth the added complexity of conform/unform.
+(spec/def ::bolt-length-specifiers
+  (fn [{:keys [total-length unthreaded-length threaded-length]}]
+    (some? (or total-length unthreaded-length threaded-length))))
+
+;; Arithmetic relationships between optional values for bolt length:
+(spec/def ::bolt-length-relationships
   (spec/and
-    ::bolt-length-parameter-keys
-    (fn [{:keys [total-length unthreaded-length threaded-length]}]
-      "Require at least one item beyond head-length."
-      (or total-length unthreaded-length threaded-length))
     (fn [{:keys [total-length head-length unthreaded-length threaded-length]}]
       "When total, unthreaded and threaded bolt lengths are all specified, the
       total length must be the sum of unthreaded length, threaded length and
@@ -62,4 +65,10 @@
       "Total bolt length cannot be shorter than head length, which is to be
       based on the diameter of the bolt and its head type."
       (if total-length (>= total-length head-length) true))))
+
+;; A composite spec:
+(spec/def ::bolt-length-parameters
+  (spec/and ::bolt-length-parameter-keys
+            ::bolt-length-specifiers
+            ::bolt-length-relationships))
 

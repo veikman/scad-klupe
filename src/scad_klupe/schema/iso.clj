@@ -128,14 +128,8 @@
                       ::base/resolution
                       ::base/include-threading ::base/negative]))
 
-;; Second, a check for the mere presence (not values) of any length specifier.
-;; See scad-klupe.schema.base for internal relationships between these.
-(spec/def ::bolt-length-specifiers
-  (spec/or
-    :specific-total-length (spec/keys :req-un [::base/total-length])
-    :specific-unthreaded-length (spec/keys :reg-un [::base/unthreaded-length])
-    :specific-threaded-length (spec/keys :req-un [::base/threaded-length])))
-
 ;; Third, the more complete spec used by scad-klupe itself.
 (spec/def ::bolt-parameters
-  (spec/and ::bolt-parameter-keys ::bolt-length-specifiers))
+  (spec/and
+    ::bolt-parameter-keys
+    ::base/bolt-length-specifiers))
