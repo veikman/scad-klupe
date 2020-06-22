@@ -191,8 +191,7 @@
   drive is supported, and even that will be ignored on a negative.
   Likewise, though a point-type parameter is accepted, the only implemented
   option beyond the default flat point is a cone."
-  [{:keys [m-diameter angle total-length unthreaded-length threaded-length
-           head-type drive-type point-type
+  [{:keys [m-diameter angle head-type drive-type point-type
            include-threading negative compensator]
     :or {angle standard-threading-angle, include-threading true,
          negative false, compensator dfm/none}
