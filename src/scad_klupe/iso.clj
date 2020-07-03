@@ -109,6 +109,21 @@
   ([m-diameter height diagonal-datum]
    (base/hex (/ (datum m-diameter diagonal-datum) 2) height)))
 
+(let [head->key {:hex :hex-head-long-diagonal
+                 :socket :socket-diameter
+                 :button :button-diameter
+                 :countersunk :countersunk-diameter}]
+  (defn- channel-above-bolt-head
+    "A round channel for a screwdriver to reach the head of a bolt.
+    This is not part of any ISO standard but merely a convenience for CAD work."
+    [{:keys [m-diameter head-type channel-diameter channel-length]}]
+    {:pre [(spec/valid? ::iso-schema/m-diameter m-diameter)
+           (spec/valid? ::iso-schema/head-type head-type)]}
+    (let [base-diameter (datum m-diameter (head-type head->key))
+          r (mapv #(/ % 2) [base-diameter (or channel-diameter base-diameter)])]
+      (model/translate [0 0 (/ channel-length 2)]
+        (model/cylinder r channel-length)))))
+
 (defn- bolt-head
   "A model of the head of a bolt, without a drive.
   This function takes an auxiliary ‘countersink-edge-fn’ which computes the
@@ -191,7 +206,7 @@
   drive is supported, and even that will be ignored on a negative.
   Likewise, though a point-type parameter is accepted, the only implemented
   option beyond the default flat point is a cone."
-  [{:keys [m-diameter angle head-type drive-type point-type
+  [{:keys [m-diameter angle head-type drive-type point-type channel-length
            include-threading negative compensator]
     :or {angle standard-threading-angle, include-threading true,
          negative false, compensator dfm/none}
@@ -214,6 +229,8 @@
         (model/translate [0 0 (/ hh -2)]
           (bolt-head merged))
         (compensator m-diameter {}
+          (when channel-length
+            (channel-above-bolt-head merged))
           (when (pos? unthreaded-length)
             (model/translate [0 0 (- (- hh) (/ unthreaded-length 2))]
               (model/cylinder r unthreaded-length)))

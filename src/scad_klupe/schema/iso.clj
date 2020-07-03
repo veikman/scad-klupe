@@ -10,7 +10,7 @@
 ;; INTERNAL CONSTANTS ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Please use scad-klupe.iso/datum in place of data in this section.
+;; Please use scad-klupe.iso/datum as an interface, not data in this section.
 ;; Contents here may change without notice.
 
 (spec/def ::iso-property #{:hex-head-short-diagonal
@@ -93,6 +93,8 @@
                    :head-type keyword
                    :drive-type keyword
                    :point-type keyword
+                   :channel-diameter num
+                   :channel-length num
                    :resolution num
                    :include-threading boolean
                    :negative boolean})
@@ -124,8 +126,8 @@
   (spec/keys :req-un [::m-diameter ::head-type]
              :opt-un [::base/pitch ::base/angle ::base/total-length
                       ::base/unthreaded-length ::base/threaded-length
-                      ::drive-type ::point-type
-                      ::base/resolution
+                      ::drive-type ::point-type ::base/channel-diameter
+                      ::base/channel-length ::base/resolution
                       ::base/include-threading ::base/negative]))
 
 ;; Third, the more complete spec used by scad-klupe itself.

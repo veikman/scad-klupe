@@ -2,7 +2,8 @@
 This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## Unreleased
-Nothing yet.
+### New
+- Added the option of channels above the heads of bolt negatives.
 
 ## [Version 0.1.0]
 ### New

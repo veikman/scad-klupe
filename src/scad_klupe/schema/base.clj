@@ -23,6 +23,8 @@
 (spec/def ::head-length ::non-negative)
 (spec/def ::unthreaded-length ::non-negative)
 (spec/def ::threaded-length ::non-negative)
+(spec/def ::channel-diameter ::non-negative)
+(spec/def ::channel-length ::positive)
 (spec/def ::resolution ::positive)
 (spec/def ::include-threading boolean?)
 (spec/def ::negative boolean?)
