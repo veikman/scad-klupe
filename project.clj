@@ -1,4 +1,4 @@
-(defproject scad-klupe "0.2.0-SNAPSHOT"
+(defproject scad-klupe "0.2.0"
   :description "Threaded fasteners for scad-clj"
   :url "https://github.com/veikman/scad-klupe"
   :license {:name "Eclipse Public License"
