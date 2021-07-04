@@ -47,7 +47,8 @@ models produced by that code are shown [here](showcase/stl).
 ## Contributing
 
 Volunteers are welcome to submit patch sets for review, including additional
-ISO standard data, more types of heads and drives, and non-metric standards.
+ISO and DIN standard data, more types of heads and drives, and non-metric
+standards.
 
 ## Acknowledgements
 
@@ -57,12 +58,15 @@ more consistent stance on parameter schemae and bundled defaults.
 
 The thread-drawing function (`scad-klupe.base/threading`) is a reimplementation
 in Clojure of a corresponding function in `polyScrewThread_r1.scad`, created by
-*aubenc* [at Thingiverse](http://www.thingiverse.com/thing:8796) and released
-by the author into the public domain.
+*aubenc* [at Thingiverse](http://www.thingiverse.com/thing:8796).
 
 ## License
 
-Copyright © 2020 Viktor Eikman
+The thread-drawing function (`scad-klupe.base/threading`) reimplements work in
+the public domain, as acknowledged above. This specific reimplementation of
+that function, and the rest of this library, are licensed as follows.
+
+Copyright © 2020–2021 Viktor Eikman
 
 This software is distributed under the [Eclipse Public License](LICENSE-EPL),
 (EPL) v2.0 or any later version thereof. This software may also be made
