@@ -2,14 +2,15 @@
 This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
-Nothing yet.
+### Added
+- DIN 562 square thin nuts.
 
 ## [Version 0.2.0]
-### New
+### Added
 - Added the option of channels above the heads of bolt negatives.
 
 ## [Version 0.1.0]
-### New
+### Added
 - Copied threaded fastener functions from `scad-tarmi`, with structural
   changes:
   - All interface functions take a map of options rather than a variary
