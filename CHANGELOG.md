@@ -2,6 +2,9 @@
 This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+Nothing yet.
+
+## [Version 0.3.0]
 ### Added
 - DIN 562 square thin nuts.
 
@@ -19,6 +22,7 @@ This change log follows the conventions of [keepachangelog.com](http://keepachan
 - Added specs for parameters to the `bolt` function as well as bolt length
   predictors.
 
-[Unreleased]: https://github.com/veikman/scad-klupe/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/veikman/scad-klupe/compare/v0.3.0...HEAD
+[Version 0.3.0]: https://github.com/veikman/scad-klupe/compare/v0.3.0...v0.2.0
 [Version 0.2.0]: https://github.com/veikman/scad-klupe/compare/v0.2.0...v0.1.0
 [Version 0.1.0]: https://github.com/veikman/scad-klupe/compare/08c4182b635a76e75aca64508790e9c79c1acd5e...v0.1.0
